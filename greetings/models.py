@@ -33,6 +33,7 @@ class Card (models.Model):
     image_file = models.FileField(upload_to='image_uploads/', null=True, blank=True)
     template = models.ForeignKey(Template, null=True, blank=True)
     text_content = models.TextField()
+    short_hash = models.CharField(max_length=10, null=True, blank=True)
     def __unicode__(self):
         return "Card from %s to %s that says %s" % (self.from_person, self.to_people, self.text_content)
 

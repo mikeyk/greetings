@@ -12,6 +12,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from greetingsweb.greetings.models import *
 import base64
 
+def card_from_hash(request, hash):
+    pass
 
 def get_greeting(request, greeting_id):
     greeting = get_object_or_404(Card, pk=greeting_id)
