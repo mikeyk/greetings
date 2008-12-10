@@ -48,7 +48,7 @@ def make_hash_list_from_objects(objects, field):
 
 def all_cards_for_id(request, person_id, since_id=0):
     json_list = list()
-    for card in Card.objects.filter(to_people=person_id, pk__gt=since_id):
+    for card in Card.objects.filter(to_people=person_id, pk__gt=since_id).order_by("-id"):
         json_list.append(json_from_card(card))
     return HttpResponse( simplejson.dumps(json_list) )
 
@@ -226,7 +226,6 @@ def make_greeting(request):
             json_response['error'] = "missing people ids"
             
     except Exception, e:
-        raise e
         json_response['success'] = False
         json_response['error'] = str(e) 
     return HttpResponse( simplejson.dumps(json_response) )
