@@ -10,7 +10,9 @@ class Template(models.Model):
 
 class Email(models.Model):
     address = models.TextField()
-    
+    def __unicode__(self):
+        return self.address
+
 class Phone(models.Model):
     number = models.TextField()
     
@@ -18,6 +20,13 @@ class Person(models.Model):
     emails = models.ManyToManyField(Email, null=True, blank=True)
     phones = models.ManyToManyField(Phone, null=True, blank=True)
     name = models.CharField(max_length=200, null=True, blank=True)
+    def __unicode__(self):
+        if self.name:
+            return self.name
+        elif self.phones:
+            return self.phones
+        elif self.emails:
+            return self.emails
  
 class EmailInline(admin.StackedInline):
     model = Email
