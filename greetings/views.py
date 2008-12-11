@@ -49,7 +49,7 @@ def make_hash_list_from_objects(objects, field):
 def sanitize_phone(raw_phone):
     if len(raw_phone) == 11:
         return raw_phone[1:]
-
+    return raw_phone
 
 def all_cards_for_id(request, person_id, since_id=0):
     json_list = list()
