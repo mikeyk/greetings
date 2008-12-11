@@ -22,7 +22,7 @@ def card_from_hash(request, hash):
     try:
         card = Card.objects.get(short_hash=hash)
         return get_greeting(request, card)
-    except ObjectDoesNotExist, e:
+    except Exception, e:
         json_response['success'] = False
         json_response['error'] = str(e)
         return HttpResponse(simplejson.dumps(json_response))
@@ -248,6 +248,7 @@ def check_or_make_dir(dirname):
             raise
     
 def add_attachment(request):
+    print "Attaching..."
     json_response = dict()
     if check_request_parameters(request, ('card_id', 'hash', 'type')) and request.FILES:
         try:
