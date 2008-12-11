@@ -248,6 +248,10 @@ def check_or_make_dir(dirname):
         else:
             raise
     
+    
+def open_from_hash(request,hash):
+    return HttpResponseRedirect("greet://%s" % hash)    
+
 def add_attachment(request):
     print "Attaching..."
     json_response = dict()
