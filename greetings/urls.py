@@ -5,7 +5,7 @@ from django.conf.urls.defaults import *
 
 
 urlpatterns = patterns('',
-    url(r'greeting/(?P<hash>(\w+))/', 'greetingsweb.greetings.views.card_from_hash', name="get-greeting"),
+    url(r'card/(?P<hash>(\w+))/', 'greetingsweb.greetings.views.card_from_hash', name="get-greeting"),
     url(r'secret/greetingbyid/(?P<greeting_id>(\d+))/', 'greetingsweb.greetings.views.card_from_id', name="get-greeting"),    
     url(r'attach/', 'greetingsweb.greetings.views.add_attachment', name="add-attachment"),
     url(r'makegreeting/', 'greetingsweb.greetings.views.make_greeting', name='make-greeting'),

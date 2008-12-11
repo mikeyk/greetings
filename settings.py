@@ -1,6 +1,6 @@
 # Django settings for greetingsweb project.
 
-DEBUG = False
+DEBUG = False 
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
