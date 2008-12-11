@@ -184,13 +184,14 @@ def new_user(request):
     
 def get_or_create_person_from_phone(phone):
     try:
-        user = find_person_from_lists(phone_list=(phone,))
+        phone_obj = Phone.objects.get(number=phone)
+        user = find_person_from_lists(phone_list=(phones,))
         if user:
             return user
         else:
             user = Person()
             user.save()
-            user.phones.add(phone)
+            user.phones.add(phone_obj)
             return user
     except Exception, e:
         return None
