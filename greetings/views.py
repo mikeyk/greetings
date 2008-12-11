@@ -108,21 +108,25 @@ def find_person_from_lists(email_list=None, phone_list=None):
     person = None
     if email_list:
         for el in email_list:
-            try:                
-                email = Email.objects.get(address=el.strip())
-                print email
-                person = Person.objects.get(emails=email)
-                return person
-            except Exception, e:
-                pass
+            if len(el) > 0:
+                try:                
+                    email = Email.objects.get(address=el.strip())
+                    print "Email is", email.address
+                    person = Person.objects.get(emails=email)
+                    return person
+                except Exception, e:
+                    pass
     if phone_list:
         for el in phone_list:
-            try:
-                phone = Phone.objects.get(number=el.strip())
-                person = Person.objects.get(phones=phone)
-                return person
-            except Exception, e:
-                pass
+            if len(el) > 0:
+                try:
+                    phone = Phone.objects.get(number=el.strip())
+                    print "Phone is", phone.number
+                    person = Person.objects.get(phones=phone)
+                    return person
+                except Exception, e:
+                    print e
+                    pass
     return None
             
     
@@ -145,25 +149,27 @@ def new_user(request):
             
                 json_response['success'] = True            
                 for email in email_list:
-                    if len(Email.objects.filter(address=email)) > 0:
-                        json_response['success'] = False
-                        json_response['error'] = "Duplicate email"
-                    else:
-                        new_email = Email()
-                        new_email.address = email
-                        new_email.save()          
-                        print "adding ", new_email.address          
-                        user.emails.add(new_email)
+                    if len(email) > 0:
+                        if len(Email.objects.filter(address=email)) > 0:
+                            json_response['success'] = False
+                            json_response['error'] = "Duplicate email"
+                        else:
+                            new_email = Email()
+                            new_email.address = email
+                            new_email.save()          
+                            print "adding ", new_email.address          
+                            user.emails.add(new_email)
                     
                 for phone in phone_list:
-                    if len(Phone.objects.filter(number=phone)) > 0:
-                        json_response['success'] = False
-                        json_response['error'] = "Duplicate phone"
-                    else:
-                        new_phone = Phone()
-                        new_phone.number = phone                    
-                        new_phone.save()
-                        user.phones.add(new_phone)
+                    if len(phone) > 0:                    
+                        if len(Phone.objects.filter(number=phone)) > 0:
+                            json_response['success'] = False
+                            json_response['error'] = "Duplicate phone"
+                        else:
+                            new_phone = Phone()
+                            new_phone.number = phone                    
+                            new_phone.save()
+                            user.phones.add(new_phone)
 
             json_response['new_id'] = user.id
         else:
