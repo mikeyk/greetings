@@ -196,6 +196,7 @@ def random_lowercase_list(length=4):
     return return_list
 
 def make_greeting(request):
+    print request.POST
     json_response = dict()
     try:
         if check_request_parameters(request, ("from_user_id", "to_people_phones") ):
@@ -257,20 +258,28 @@ def add_attachment(request):
 
             date_string = datetime.datetime.now().strftime('%m-%d')
             short_name = ""
+            image = False
+            sound = False
             if request.REQUEST['type'] == 'image':
+                image = True
                 short_name = "image_uploads/%s/" % (date_string)
                 dir_name = settings.MEDIA_ROOT + (short_name)
                 check_or_make_dir(dir_name)
                 out_url = dir_name + "%s.caf"%card.short_hash
             elif request.REQUEST['type'] == 'sound':
-                short_hash = "audio_uploads/%s/" % (date_string)
+                sound = True
+                short_name = "audio_uploads/%s/" % (date_string)
                 dir_name = settings.MEDIA_ROOT + (short_name)
                 check_or_make_dir(dir_name)
                 out_url = dir_name + "%s.caf"%card.short_hash
+            print "Out to ", out_url
             out_fl = open(out_url, 'w')
             for eachfile in request.FILES:
                 out_fl.write(request.FILES[eachfile].read())
-            card.audio_file = out_url
+            if image:
+                card.image_file = out_url
+            elif sound:
+                card.audio_file = out_url
             card.save()
             json_response['success'] = True
         except Exception, e:
