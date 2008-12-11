@@ -42,7 +42,6 @@ class Card (models.Model):
     to_people = models.ManyToManyField(Person, related_name="to_people", null=True, blank=True)
     audio_file = models.FileField(upload_to='audio_uploads/', null=True, blank=True)
     image_file = models.FileField(upload_to='image_uploads/', null=True, blank=True)
-    template = models.ForeignKey(Template, null=True, blank=True)
     template_name = models.CharField(max_length=100, null=True, blank=True)
     text_content = models.TextField()
     short_hash = models.CharField(max_length=10, null=True, blank=True)

@@ -45,6 +45,10 @@ def make_hash_list_from_objects(objects, field):
         m.update( eval("entry."+field) )
         hash_list.append(m.hexdigest())
     return hash_list
+    
+def sanitize_phone(raw_phone):
+    if len(raw_phone) == 11:
+        return raw_phone[1:]
 
 
 def all_cards_for_id(request, person_id, since_id=0):
@@ -168,7 +172,8 @@ def new_user(request):
                             user.emails.add(new_email)
                     
                 for phone in phone_list:
-                    if len(phone) > 0:                    
+                    if len(phone) > 0:
+                        phone = sanitize_phone(phone)                
                         if len(Phone.objects.filter(number=phone)) > 0:
                             json_response['success'] = False
                             json_response['error'] = "Duplicate phone"
@@ -233,6 +238,7 @@ def make_greeting(request):
             
             new_card.save()            
             for phone in request.REQUEST["to_people_phones"].split(","):
+                phone = sanitize_phone(phone)
                 other_person = get_or_create_person_from_phone(phone)
                 print "other person was found to be", other_person, " based on ", phone.strip()
                 if other_person:
