@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import ModelForm
 from django.db.models.query import Q
 from django.utils import simplejson
+from django.contrib.humanize.templatetags.humanize import naturalday
 from django.core.exceptions import ObjectDoesNotExist
 from greetingsweb.greetings.models import *
 import base64
@@ -77,7 +78,10 @@ def json_from_card(card):
     json['from_id'] = greeting.from_person.id
     json['to'] = [str(person) for person in greeting.to_people.all() ]
     json['hash'] = greeting.short_hash
+    json['date'] = naturalday(greeting.date_sent, "M j")
     json['text'] = greeting.text_content
+    if greeting.template_name:
+        json['template_name'] = greeting.template_name
     if greeting.image_file:
         json['image_url'] = greeting.image_file.url
     json['template'] = greeting.template
@@ -140,6 +144,9 @@ def new_user(request):
             email_list = request.REQUEST['email_list'].split(',')
             phone_list = request.REQUEST['phone_list'].split(',')            
             user = find_person_from_lists(email_list=email_list, phone_list=phone_list)
+            if user:
+                user.name = request.REQUEST['name']
+                user.save()
             if not user:
                 user = Person()            
                 user.name = request.REQUEST['name']
@@ -184,16 +191,24 @@ def new_user(request):
     
 def get_or_create_person_from_phone(phone):
     try:
-        phone_obj = Phone.objects.get(number=phone)
-        user = find_person_from_lists(phone_list=(phones,))
+        try:
+            phone_obj = Phone.objects.get(number=phone)
+        except ObjectDoesNotExist, e:
+            phone_obj = Phone()
+            phone_obj.number = phone
+            phone_obj.save()
+        user = find_person_from_lists(phone_list=(phone,))
         if user:
+            print "OMG I FOUND SOMEONE", user
             return user
         else:
+            print "dont know nobody with that phone"
             user = Person()
             user.save()
             user.phones.add(phone_obj)
             return user
     except Exception, e:
+        print str(e)
         return None
         
 def random_lowercase_list(length=4):
@@ -219,6 +234,7 @@ def make_greeting(request):
             new_card.save()            
             for phone in request.REQUEST["to_people_phones"].split(","):
                 other_person = get_or_create_person_from_phone(phone)
+                print "other person was found to be", other_person, " based on ", phone.strip()
                 if other_person:
                     new_card.to_people.add( get_or_create_person_from_phone(phone) )
             if check_request_parameters(request, ("text",) ):
@@ -257,7 +273,9 @@ def check_or_make_dir(dirname):
     
     
 def open_from_hash(request,hash):
-    return HttpResponseRedirect("greet://%s" % hash)    
+    card = get_object_or_404(Card, short_hash=hash)
+    # for now, just the first person
+    return HttpResponseRedirect("greet://%s/%s" % (hash, card.to_people.all()[0].id))    
 
 def add_attachment(request):
     print "Attaching..."
@@ -276,21 +294,21 @@ def add_attachment(request):
                 short_name = "image_uploads/%s/" % (date_string)
                 dir_name = settings.MEDIA_ROOT + (short_name)
                 check_or_make_dir(dir_name)
-                out_url = dir_name + "%s.caf"%card.short_hash
+                out_url = dir_name + "%s.jpg"%card.short_hash
             elif request.REQUEST['type'] == 'sound':
                 sound = True
                 short_name = "audio_uploads/%s/" % (date_string)
                 dir_name = settings.MEDIA_ROOT + (short_name)
                 check_or_make_dir(dir_name)
-                out_url = dir_name + "%s.caf"%card.short_hash
+                out_url = dir_name + "%s.caf" %card.short_hash
             print "Out to ", out_url
             out_fl = open(out_url, 'w')
             for eachfile in request.FILES:
                 out_fl.write(request.FILES[eachfile].read())
             if image:
-                card.image_file = out_url
+                card.image_file = short_name + "%s.jpg" %card.short_hash
             elif sound:
-                card.audio_file = out_url
+                card.audio_file = short_name + "%s.caf" %card.short_hash
             card.save()
             json_response['success'] = True
         except Exception, e:

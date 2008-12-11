@@ -15,6 +15,8 @@ class Email(models.Model):
 
 class Phone(models.Model):
     number = models.TextField()
+    def __unicode__(self):
+        return self.number
     
 class Person(models.Model):
     emails = models.ManyToManyField(Email, null=True, blank=True)
@@ -24,9 +26,9 @@ class Person(models.Model):
         if self.name:
             return self.name
         elif self.phones:
-            return self.phones
+            return str(self.phones.all())
         elif self.emails:
-            return self.emails
+            return str(self.emails.all())
  
 class EmailInline(admin.StackedInline):
     model = Email
@@ -41,10 +43,12 @@ class Card (models.Model):
     audio_file = models.FileField(upload_to='audio_uploads/', null=True, blank=True)
     image_file = models.FileField(upload_to='image_uploads/', null=True, blank=True)
     template = models.ForeignKey(Template, null=True, blank=True)
+    template_name = models.CharField(max_length=100, null=True, blank=True)
     text_content = models.TextField()
     short_hash = models.CharField(max_length=10, null=True, blank=True)
+    date_sent = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     def __unicode__(self):
-        return "Card from %s to %s that says %s" % (self.from_person, self.to_people, self.text_content)
+        return "Card from %s sent at %s to %s that says %s" % (self.from_person, self.date_sent, str(self.to_people.all()), self.text_content)
 
 
 
