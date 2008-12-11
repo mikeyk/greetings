@@ -88,7 +88,6 @@ def json_from_card(card):
         json['template_name'] = greeting.template_name
     if greeting.image_file:
         json['image_url'] = greeting.image_file.url
-    json['template'] = greeting.template
     if greeting.audio_file:
         print greeting.audio_file.name
         print greeting.audio_file.url
