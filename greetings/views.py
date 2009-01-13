@@ -225,9 +225,10 @@ def make_greeting(request):
     print request.POST
     json_response = dict()
     try:
-        if check_request_parameters(request, ("from_user_id", "to_people_phones") ):
+        if check_request_parameters(request, ("template_name", "from_user_id", "to_people_phones") ):
             new_card = Card()
-            new_card.from_person = Person.objects.get(pk=request.REQUEST['from_user_id'])            
+            new_card.from_person = Person.objects.get(pk=request.REQUEST['from_user_id'])
+            new_card.template_name = request.REQUEST['template_name']            
             card_hash = None
             while( card_hash == None ):
                 new_hash = "".join([str(x) for x in random_lowercase_list()])
@@ -247,6 +248,7 @@ def make_greeting(request):
 
 
             new_card.save()
+            
             json_response['success'] = True
             json_response['card_id'] = new_card.id
             json_response['hash'] = new_card.short_hash
