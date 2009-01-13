@@ -82,7 +82,7 @@ def json_from_card(card):
     json['from_id'] = greeting.from_person.id
     json['to'] = [str(person) for person in greeting.to_people.all() ]
     json['hash'] = greeting.short_hash
-    json['date'] = naturalday(greeting.date_sent, "M j")
+    json['date'] = greeting.date_sent
     json['text'] = greeting.text_content
     if greeting.template_name:
         json['template_name'] = greeting.template_name
