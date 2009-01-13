@@ -82,10 +82,12 @@ def json_from_card(card):
     json['from_id'] = greeting.from_person.id
     json['to'] = [str(person) for person in greeting.to_people.all() ]
     json['hash'] = greeting.short_hash
-    json['date'] = str(greeting.date_sent.isoformat())
+    json['date'] = str("%s-%s-%s" % (greeting.date_sent.year, greeting.date_sent.month, greeting.date_sent.day ))
     json['text'] = greeting.text_content
     if greeting.template_name:
         json['template_name'] = greeting.template_name
+    else:
+        json['template_name'] = "polaroid"
     if greeting.image_file:
         json['image_url'] = greeting.image_file.url
     if greeting.audio_file:
