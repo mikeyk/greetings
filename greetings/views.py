@@ -82,7 +82,7 @@ def json_from_card(card):
     json['from_id'] = greeting.from_person.id
     json['to'] = [str(person) for person in greeting.to_people.all() ]
     json['hash'] = greeting.short_hash
-    json['date'] = greeting.date_sent
+    json['date'] = str(greeting.date_sent.isoformat())
     json['text'] = greeting.text_content
     if greeting.template_name:
         json['template_name'] = greeting.template_name
